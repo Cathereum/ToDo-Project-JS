@@ -34,10 +34,10 @@ function addTask(event) {
 }
 
 function deleteTask(event) {
-  if (event.target.dataset.action === "delete") {
-    const removedTask = event.target.closest(".list-group-item");
-    removedTask.remove();
-  }
+  if (event.target.dataset.action !== "delete") return;
+
+  const removedTask = event.target.closest(".list-group-item");
+  removedTask.remove();
 
   if (tasksList.children.length === 1) {
     emptyList.classList.remove("none");
@@ -45,9 +45,9 @@ function deleteTask(event) {
 }
 
 function completeTask(event) {
-  if (event.target.dataset.action === "done") {
-    const completedTask = event.target.closest(".list-group-item");
-    const taskTitle = completedTask.querySelector(".task-title");
-    taskTitle.classList.toggle("task-title--done");
-  }
+  if (event.target.dataset.action !== "done") return;
+
+  const completedTask = event.target.closest(".list-group-item");
+  const taskTitle = completedTask.querySelector(".task-title");
+  taskTitle.classList.toggle("task-title--done");
 }

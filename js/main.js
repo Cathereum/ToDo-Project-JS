@@ -5,6 +5,15 @@ const emptyList = document.querySelector("#emptyList");
 
 let allTasks = [];
 
+if (localStorage.getItem("allTasks")) {
+  allTasks = JSON.parse(localStorage.getItem("allTasks"));
+  allTasks.forEach(function (task) {
+    renderTasks(task);
+  });
+}
+
+checkEmptyList();
+
 form.addEventListener("submit", addTask);
 tasksList.addEventListener("click", deleteTask);
 tasksList.addEventListener("click", completeTask);
@@ -21,28 +30,13 @@ function addTask(event) {
 
   allTasks.push(newTask);
 
-  const cssClass = newTask.done ? "task-title task-title--done" : "task-title";
-
-  const taskHTML = `<li id="${newTask.id}" class="list-group-item d-flex justify-content-between task-item">
-  <span class="${cssClass}">${newTask.text}</span>
-  <div class="task-item__buttons">
-      <button type="button" data-action="done" class="btn-action">
-          <img src="./img/tick.svg" alt="Done" width="18" height="18">
-      </button>
-      <button type="button" data-action="delete" class="btn-action">
-          <img src="./img/cross.svg" alt="Done" width="18" height="18">
-      </button>
-  </div>
-</li>`;
-
-  tasksList.insertAdjacentHTML("beforeend", taskHTML);
+  renderTasks(newTask);
 
   taskInput.value = "";
   taskInput.focus();
+  checkEmptyList();
 
-  if (tasksList.children.length > 1) {
-    emptyList.classList.add("none");
-  }
+  saveToLocalStorage();
 }
 
 function deleteTask(event) {
@@ -55,10 +49,9 @@ function deleteTask(event) {
   allTasks = allTasks.filter((task) => task.id !== id);
 
   removedTask.remove();
+  checkEmptyList();
 
-  if (tasksList.children.length === 1) {
-    emptyList.classList.remove("none");
-  }
+  saveToLocalStorage();
 }
 
 function completeTask(event) {
@@ -76,4 +69,38 @@ function completeTask(event) {
 
   const taskTitle = completedTask.querySelector(".task-title");
   taskTitle.classList.toggle("task-title--done");
+
+  saveToLocalStorage();
+}
+
+function checkEmptyList() {
+  if (allTasks.length !== 0) {
+    emptyList.classList.add("none");
+  }
+
+  if (allTasks.length === 0) {
+    emptyList.classList.remove("none");
+  }
+}
+
+function saveToLocalStorage() {
+  localStorage.setItem("allTasks", JSON.stringify(allTasks));
+}
+
+function renderTasks(task) {
+  const cssClass = task.done ? "task-title task-title--done" : "task-title";
+
+  const taskHTML = `<li id="${task.id}" class="list-group-item d-flex justify-content-between task-item">
+  <span class="${cssClass}">${task.text}</span>
+  <div class="task-item__buttons">
+      <button type="button" data-action="done" class="btn-action">
+          <img src="./img/tick.svg" alt="Done" width="18" height="18">
+      </button>
+      <button type="button" data-action="delete" class="btn-action">
+          <img src="./img/cross.svg" alt="Done" width="18" height="18">
+      </button>
+  </div>
+</li>`;
+
+  tasksList.insertAdjacentHTML("beforeend", taskHTML);
 }
